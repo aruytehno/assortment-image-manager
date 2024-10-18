@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование изображений</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Редактирование изображений</h1>
+
+    <!-- Динамическое содержимое для отображения изображений -->
+    <div id="image-container">
+        {% if data %}
+            {% for item in data %}
+            <div class="artikul-section" id="artikul-{{ item['artikul'] }}">
+                <div class="artikul-title">Артикул: {{ item['artikul'] }}</div>
+                <div class="images" id="images-{{ item['artikul'] }}">
+                    {% for img in item['images'] %}
+                        {% if img %}
+                        <div class="image-wrapper">
+                            <img src="{{ img['path'] }}" class="sortable-img" data-url="{{ img['url'] }}">
+                            <button class="delete-btn" onclick="deleteImage('{{ item['artikul'] }}', '{{ img['url'] }}')">X</button>
+                        </div>
+                        {% else %}
+                        <div class="no-image">Нет изображения</div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <p>Данных нет</p>
+        {% endif %}
+    </div>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="/?page={{ page - 1 }}">Предыдущая</a>
+        {% endif %}
+
+        {% if page > 3 %}
+        <a href="/?page=1">1</a>
+        {% if page > 4 %}
+        <span>...</span>
+        {% endif %}
+        {% endif %}
+
+        {% for p in range(max(1, page-2), page) %}
+        <a href="/?page={{ p }}">{{ p }}</a>
+        {% endfor %}
+
+        <a href="/?page={{ page }}" class="active">{{ page }}</a>
+
+        {% for p in range(page + 1, min(total_pages + 1, page + 3)) %}
+        <a href="/?page={{ p }}">{{ p }}</a>
+        {% endfor %}
+
+        {% if page < total_pages - 2 %}
+        {% if page < total_pages - 3 %}
+        <span>...</span>
+        {% endif %}
+        <a href="/?page={{ total_pages }}">{{ total_pages }}</a>
+        {% endif %}
+
+        {% if page < total_pages %}
+        <a href="/?page={{ page + 1 }}">Следующая</a>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Подключаем скрипты -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
